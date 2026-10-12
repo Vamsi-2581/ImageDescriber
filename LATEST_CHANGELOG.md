@@ -1,7 +1,7 @@
-## v1.2.8 (patch)
+## v1.2.9-pre.1 (prerelease)
 
-Changes since v1.2.7:
+Changes since v1.2.8:
 
-- Use a test input that is a legal extension on Windows too ([@Claude](https://github.com/Claude))
-- Drop a trailing period from a suggested file name [patch] ([@Claude](https://github.com/Claude))
+- Bump Polyfill from 11.4.3 to 11.4.4 ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 4 updates ([@dependabot[bot]](https://github.com/dependabot[bot]))
 

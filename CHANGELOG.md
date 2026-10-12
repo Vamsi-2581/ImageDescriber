@@ -1,3 +1,10 @@
+## v1.2.9-pre.1 (prerelease)
+
+Changes since v1.2.8:
+
+- Bump Polyfill from 11.4.3 to 11.4.4 ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump the ktsu group with 4 updates ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
 ## v1.2.8 (patch)
 
 Changes since v1.2.7:
