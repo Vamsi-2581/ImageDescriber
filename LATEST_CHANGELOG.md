@@ -1,7 +1,7 @@
-## v1.2.9-pre.1 (prerelease)
+## v1.2.9 (patch)
 
 Changes since v1.2.8:
 
-- Bump Polyfill from 11.4.3 to 11.4.4 ([@dependabot[bot]](https://github.com/dependabot[bot]))
-- Bump the ktsu group with 4 updates ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Cover the semantic-validation failure on JSON import ([@Claude](https://github.com/Claude))
+- Report a malformed JSON import instead of crashing [patch] ([@Claude](https://github.com/Claude))
 
