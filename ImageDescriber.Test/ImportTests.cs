@@ -293,6 +293,7 @@ public class ImportTests
 	[DataRow("{\"not\":\"array\"}")]
 	[DataRow("[{\"Hash\":\"aaaa")]
 	[DataRow("[{\"Hash\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"FileSizeBytes\":\"abc\"}]")]
+	[DataRow("[{\"Hash\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"KnownPaths\":[\"relative/photo.jpg\"]}]")]
 	public void RunReportsAMalformedJsonFileWithoutThrowingOrChangingTheStore(string json)
 	{
 		PersistentState originalSettings = Program.Settings;
