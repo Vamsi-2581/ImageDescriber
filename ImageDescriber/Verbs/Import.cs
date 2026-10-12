@@ -162,10 +162,26 @@ internal sealed class Import : BaseVerb<Import>
 		return pathsAdded;
 	}
 
-	private static List<ImageDescription> ImportJson(AbsoluteFilePath inputPath)
+	private static List<ImageDescription>? ImportJson(AbsoluteFilePath inputPath)
 	{
 		string json = File.ReadAllText(inputPath.WeakString);
-		return JsonSerializer.Deserialize<List<ImageDescription>>(json, JsonOptions) ?? [];
+
+		// A truncated or hand-edited file, or one that isn't an export at all, has to end the
+		// import before anything is merged or saved, not end the process with a stack trace.
+		try
+		{
+			return JsonSerializer.Deserialize<List<ImageDescription>>(json, JsonOptions) ?? [];
+		}
+		catch (JsonException ex)
+		{
+			Console.WriteLine($"Error: {inputPath} is not a valid ImageDescriber JSON export: {ex.Message}");
+			return null;
+		}
+		catch (ArgumentException ex)
+		{
+			Console.WriteLine($"Error: {inputPath} is not a valid ImageDescriber JSON export: {ex.Message}");
+			return null;
+		}
 	}
 
 	private static List<ImageDescription> ImportCsv(AbsoluteFilePath inputPath) =>
