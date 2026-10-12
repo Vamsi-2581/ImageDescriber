@@ -288,4 +288,36 @@ public class ImportTests
 		Assert.AreSequenceEqual(ExpectedEscapedQuoteRecord, records[2].Fields);
 		Assert.AreEqual(5, records[2].LineNumber);
 	}
+
+	[TestMethod]
+	[DataRow("{\"not\":\"array\"}")]
+	[DataRow("[{\"Hash\":\"aaaa")]
+	[DataRow("[{\"Hash\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"FileSizeBytes\":\"abc\"}]")]
+	[DataRow("[{\"Hash\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"KnownPaths\":[\"relative/photo.jpg\"]}]")]
+	public void RunReportsAMalformedJsonFileWithoutThrowingOrChangingTheStore(string json)
+	{
+		PersistentState originalSettings = Program.Settings;
+		TextWriter originalOut = Console.Out;
+		string file = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".json");
+		File.WriteAllText(file, json);
+		try
+		{
+			Program.Settings = new PersistentState();
+			using StringWriter output = new();
+			Console.SetOut(output);
+
+			Import import = new();
+			import.Run(new Import { InputPath = file });
+
+			Assert.IsTrue(import.Failed);
+			Assert.IsEmpty(Program.Settings.Descriptions);
+			Assert.Contains(file, output.ToString());
+		}
+		finally
+		{
+			Console.SetOut(originalOut);
+			Program.Settings = originalSettings;
+			File.Delete(file);
+		}
+	}
 }
