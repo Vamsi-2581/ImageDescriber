@@ -1,7 +1,7 @@
-## v1.2.9 (patch)
+## v1.2.10-pre.1 (prerelease)
 
-Changes since v1.2.8:
+Changes since v1.2.9:
 
-- Cover the semantic-validation failure on JSON import ([@Claude](https://github.com/Claude))
-- Report a malformed JSON import instead of crashing [patch] ([@Claude](https://github.com/Claude))
+- Bump ktsu.RoundTripStringJsonConverter and ktsu.Semantics.Paths (dependabot[bot])
+- Bump Polyfill from 11.4.4 to 11.4.5 (dependabot[bot])
 
