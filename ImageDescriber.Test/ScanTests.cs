@@ -48,6 +48,52 @@ public class ScanTests
 	}
 
 	[TestMethod]
+	public void SanitizeFileNameCapsALongSentenceAtAWordBoundary()
+	{
+		string sentence = string.Join(' ', Enumerable.Repeat("a sunset over the ocean with gentle waves", 8));
+
+		FileName result = Scan.SanitizeFileName(sentence, ".jpg".As<FileExtension>());
+
+		string stem = result.WeakString[..^".jpg".Length];
+		Assert.IsLessThanOrEqualTo(Scan.MaxStemBytes, Encoding.UTF8.GetByteCount(stem), result.WeakString);
+		Assert.IsTrue(sentence.StartsWith(stem, StringComparison.Ordinal), result.WeakString);
+		Assert.AreEqual(' ', sentence[stem.Length], "The cap should cut back to a whole word.");
+		Assert.IsFalse(stem.EndsWith('-') || stem.EndsWith('.'), result.WeakString);
+	}
+
+	[TestMethod]
+	public void SanitizeFileNameCapsAMultibyteNameInUtf8Bytes()
+	{
+		string answer = string.Concat(Enumerable.Repeat("夕焼けの海🌅", 60));
+
+		FileName result = Scan.SanitizeFileName(answer, ".png".As<FileExtension>());
+
+		Assert.IsLessThanOrEqualTo(255, Encoding.UTF8.GetByteCount(result.WeakString), result.WeakString);
+		Assert.IsTrue(result.WeakString.EndsWith(".png", StringComparison.Ordinal), result.WeakString);
+		Assert.IsFalse(char.IsHighSurrogate(result.WeakString[^5]), "The cap must not split a surrogate pair.");
+	}
+
+	[TestMethod]
+	public void SanitizeFileNameCapsAHyphenatedNameAtAHyphen()
+	{
+		string answer = string.Join('-', Enumerable.Repeat("sunset-over-the-ocean", 12));
+
+		FileName result = Scan.SanitizeFileName(answer, ".jpg".As<FileExtension>());
+
+		string stem = result.WeakString[..^".jpg".Length];
+		Assert.IsLessThanOrEqualTo(Scan.MaxStemBytes, stem.Length, result.WeakString);
+		Assert.AreEqual('-', answer[stem.Length], "The cap should cut back to a whole word.");
+	}
+
+	[TestMethod]
+	public void SanitizeFileNameKeepsANameUnderTheCap()
+	{
+		FileName result = Scan.SanitizeFileName("golden-retriever-on-a-beach", ".jpg".As<FileExtension>());
+
+		Assert.AreEqual("golden-retriever-on-a-beach.jpg", result.WeakString);
+	}
+
+	[TestMethod]
 	public void SanitizeFileNameReturnsUnnamedForEmpty()
 	{
 		FileName result = Scan.SanitizeFileName("", ".jpg".As<FileExtension>());
