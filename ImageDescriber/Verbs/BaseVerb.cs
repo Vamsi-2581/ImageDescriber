@@ -12,7 +12,7 @@ using ktsu.Semantics.Strings;
 internal abstract class BaseVerb : ICommand
 {
 	[Option('p', "path", Required = false, HelpText = "The root path to scan for images.")]
-	public string PathString { get; set; } = ".";
+	public string PathString { get; set; } = string.Empty;
 
 	[Option('e', "endpoint", Required = false, HelpText = "The Ollama API endpoint URL.")]
 	public string EndpointString { get; set; } = string.Empty;
@@ -25,7 +25,8 @@ internal abstract class BaseVerb : ICommand
 	/// <summary>Whether the last run failed, which makes the process exit non-zero.</summary>
 	internal bool Failed { get; set; }
 
-	internal AbsoluteDirectoryPath Path => System.IO.Path.GetFullPath(PathString).As<AbsoluteDirectoryPath>();
+	// An empty PathString means no -p was given, so a verb that doesn't ask for one uses the current directory
+	internal AbsoluteDirectoryPath Path => System.IO.Path.GetFullPath(string.IsNullOrWhiteSpace(PathString) ? "." : PathString).As<AbsoluteDirectoryPath>();
 
 	internal OllamaEndpoint Endpoint
 	{

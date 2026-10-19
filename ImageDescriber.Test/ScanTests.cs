@@ -48,6 +48,50 @@ public class ScanTests
 	}
 
 	[TestMethod]
+	public void ValidateArgsKeepsAnExplicitDotPathWithoutPrompting()
+	{
+		Scan scan = new() { PathString = "." };
+
+		(bool valid, string output) = ValidateWithInput(scan, string.Empty);
+
+		Assert.IsTrue(valid, output);
+		Assert.IsFalse(output.Contains("Enter the path", StringComparison.Ordinal), "An explicit -p . should not prompt.");
+		Assert.AreEqual(".", scan.PathString);
+		Assert.AreEqual(Path.GetFullPath("."), scan.Path.WeakString.TrimEnd(Path.DirectorySeparatorChar));
+	}
+
+	[TestMethod]
+	public void ValidateArgsPromptsWhenNoPathWasGiven()
+	{
+		Scan scan = new();
+
+		(bool valid, string output) = ValidateWithInput(scan, "/tmp/pictures\n");
+
+		Assert.IsTrue(valid, output);
+		StringAssert.Contains(output, "Enter the path");
+		Assert.AreEqual("/tmp/pictures", scan.PathString);
+	}
+
+	private static (bool Valid, string Output) ValidateWithInput(Scan scan, string input)
+	{
+		TextReader originalIn = Console.In;
+		TextWriter originalOut = Console.Out;
+		using StringReader reader = new(input);
+		using StringWriter output = new();
+		Console.SetIn(reader);
+		Console.SetOut(output);
+		try
+		{
+			return (scan.ValidateArgs(), output.ToString());
+		}
+		finally
+		{
+			Console.SetIn(originalIn);
+			Console.SetOut(originalOut);
+		}
+	}
+
+	[TestMethod]
 	public void SanitizeFileNameReturnsUnnamedForEmpty()
 	{
 		FileName result = Scan.SanitizeFileName("", ".jpg".As<FileExtension>());

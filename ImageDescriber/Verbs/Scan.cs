@@ -22,7 +22,8 @@ internal sealed class Scan : BaseVerb<Scan>
 
 	internal override bool ValidateArgs()
 	{
-		if (PathString is "." or "")
+		// Only a missing -p prompts. An explicit "-p ." is the current directory, as a script means it
+		if (string.IsNullOrWhiteSpace(PathString))
 		{
 			Console.Write("Enter the path to scan: ");
 			string? input = Console.ReadLine()?.Trim();
@@ -160,7 +161,7 @@ internal sealed class Scan : BaseVerb<Scan>
 		Console.WriteLine("Scan complete.");
 		Console.WriteLine($"Total descriptions in database: {Program.Settings.Descriptions.Count}");
 
-		PathString = ".";
+		PathString = string.Empty;
 	}
 
 	private static void PrintFailureSummary(IReadOnlyList<string> failures)
