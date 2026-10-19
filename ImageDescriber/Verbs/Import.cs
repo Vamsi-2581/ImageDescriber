@@ -95,9 +95,11 @@ internal sealed class Import : BaseVerb<Import>
 		int updatedCount = 0;
 		int skippedCount = 0;
 
-		foreach (ImageDescription entry in entries)
+		// A JSON null in the exported array deserializes to a null entry rather than a JsonException,
+		// so it is skipped here like an entry with no hash instead of ending the import mid-merge.
+		foreach (ImageDescription? entry in entries)
 		{
-			if (string.IsNullOrEmpty(entry.Hash))
+			if (entry is null || string.IsNullOrEmpty(entry.Hash))
 			{
 				skippedCount++;
 				continue;
