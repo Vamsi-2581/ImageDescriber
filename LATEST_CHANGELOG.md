@@ -1,7 +1,7 @@
-## v1.2.10 (patch)
+## v1.2.11 (patch)
 
-Changes since v1.2.9:
+Changes since v1.2.10:
 
-- Cap a suggested file name at 150 UTF-8 bytes, cut back to a whole word [patch] (Claude)
-- Skip a null entry in a JSON import instead of crashing [patch] (Claude)
+- Merge main into fix/181-explicit-dot-path (Claude)
+- Scan an explicit -p . instead of prompting for a path [patch] (Claude)
 
