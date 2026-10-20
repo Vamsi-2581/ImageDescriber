@@ -4,8 +4,10 @@ namespace ktsu.ImageDescriber.Verbs;
 
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -285,7 +287,7 @@ internal sealed class Scan : BaseVerb<Scan>
 			name = name.Replace("--", "-", StringComparison.Ordinal);
 		}
 
-		name = name.Trim('-', ' ', '.');
+		name = CapLength(name.Trim('-', ' ', '.'));
 
 		if (string.IsNullOrEmpty(name))
 		{
@@ -299,6 +301,46 @@ internal sealed class Scan : BaseVerb<Scan>
 		}
 
 		return $"{name}{extension}".As<FileName>();
+	}
+
+	// NTFS, ext4 and APFS allow 255 bytes or UTF-16 units per name. Capping the stem well below that,
+	// in UTF-8 bytes, keeps a multibyte name legal everywhere once the extension is added
+	internal const int MaxStemBytes = 150;
+
+	// A chatty model can answer with a whole sentence on one line. Keep whole characters up to the
+	// cap, then cut back to the last hyphen or space so the name doesn't end mid-word
+	private static string CapLength(string name)
+	{
+		if (Encoding.UTF8.GetByteCount(name) <= MaxStemBytes)
+		{
+			return name;
+		}
+
+		StringBuilder kept = new();
+		int keptBytes = 0;
+		TextElementEnumerator elements = StringInfo.GetTextElementEnumerator(name);
+		while (elements.MoveNext())
+		{
+			string element = elements.GetTextElement();
+			int elementBytes = Encoding.UTF8.GetByteCount(element);
+			if (keptBytes + elementBytes > MaxStemBytes)
+			{
+				break;
+			}
+
+			kept.Append(element);
+			keptBytes += elementBytes;
+		}
+
+		string capped = kept.ToString();
+		bool cutAtWordBoundary = name[capped.Length] is '-' or ' ';
+		int lastBoundary = capped.LastIndexOfAny(['-', ' ']);
+		if (!cutAtWordBoundary && lastBoundary > 0)
+		{
+			capped = capped[..lastBoundary];
+		}
+
+		return capped.Trim('-', ' ', '.');
 	}
 
 	private static readonly HashSet<string> WindowsReservedNames = new(
