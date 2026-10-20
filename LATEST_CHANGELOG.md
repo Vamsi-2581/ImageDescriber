@@ -1,7 +1,7 @@
-## v1.2.10-pre.1 (prerelease)
+## v1.2.10 (patch)
 
 Changes since v1.2.9:
 
-- Bump ktsu.RoundTripStringJsonConverter and ktsu.Semantics.Paths (dependabot[bot])
-- Bump Polyfill from 11.4.4 to 11.4.5 (dependabot[bot])
+- Cap a suggested file name at 150 UTF-8 bytes, cut back to a whole word [patch] (Claude)
+- Skip a null entry in a JSON import instead of crashing [patch] (Claude)
 
