@@ -56,6 +56,27 @@ public class SearchTests
 	}
 
 	[TestMethod]
+	public void MergeEntriesSkipsANullEntryAndKeepsTheRest()
+	{
+		// A JSON export ending in `null` deserializes to a list with a null item
+		Program.Settings = new PersistentState();
+		string validHash = new('c', ImageHasher.HashLength);
+		List<ImageDescription> entries =
+		[
+			new() { Hash = validHash },
+			null!,
+		];
+
+		(int NewCount, int UpdatedCount, int SkippedCount) result = default;
+		CaptureConsole(() => result = Import.MergeEntries(entries));
+
+		Assert.AreEqual(1, result.NewCount);
+		Assert.AreEqual(1, result.SkippedCount);
+		string[] expectedKeys = [validHash];
+		CollectionAssert.AreEquivalent(expectedKeys, Program.Settings.Descriptions.Keys.ToArray());
+	}
+
+	[TestMethod]
 	public void MergeEntriesStoresAnUpperCaseHashAsTheLowerCaseHashScanLooksUp()
 	{
 		Program.Settings = new PersistentState();
